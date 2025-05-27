@@ -15,18 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
-        const activityCard = document.createElement("div");
-        activityCard.className = "activity-card";
-
-        const spotsLeft = details.max_participants - details.participants.length;
-
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-        `;
-
+        const activityCard = createActivityCard(name, details);
         activitiesList.appendChild(activityCard);
 
         // Add option to select dropdown
@@ -39,6 +28,47 @@ document.addEventListener("DOMContentLoaded", () => {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
       console.error("Error fetching activities:", error);
     }
+  }
+
+  // Create activity card element
+  function createActivityCard(activityName, activity) {
+    const card = document.createElement("div");
+    card.className = "activity-card";
+
+    // Title, description, schedule, and availability
+    card.innerHTML = `
+      <h4>${activityName}</h4>
+      <p>${activity.description}</p>
+      <p><strong>Schedule:</strong> ${activity.schedule}</p>
+      <p><strong>Availability:</strong> ${activity.max_participants - activity.participants.length} spots left</p>
+    `;
+
+    // Participants section
+    const participantsSection = document.createElement("div");
+    participantsSection.className = "participants-section";
+    const participantsTitle = document.createElement("div");
+    participantsTitle.className = "participants-title";
+    participantsTitle.textContent = "Participantes:";
+    participantsSection.appendChild(participantsTitle);
+
+    const participantsList = document.createElement("ul");
+    participantsList.className = "participants-list";
+    if (activity.participants && activity.participants.length > 0) {
+      activity.participants.forEach(email => {
+        const li = document.createElement("li");
+        li.textContent = email;
+        participantsList.appendChild(li);
+      });
+    } else {
+      const li = document.createElement("li");
+      li.textContent = "Nenhum participante ainda.";
+      participantsList.appendChild(li);
+    }
+    participantsSection.appendChild(participantsList);
+
+    card.appendChild(participantsSection);
+
+    return card;
   }
 
   // Handle form submission
